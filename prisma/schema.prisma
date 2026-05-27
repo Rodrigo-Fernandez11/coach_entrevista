@@ -1,0 +1,126 @@
+// Prisma schema for AI Interview Coach v1
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ──────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────
+
+enum AnswerStatus {
+  pending
+  transcribing
+  analyzing
+  done
+  failed
+}
+
+enum QuestionCategory {
+  behavioral
+  technical
+  situational
+}
+
+enum QuestionLevel {
+  junior
+  mid
+  senior
+}
+
+enum SessionStatus {
+  pending
+  completed
+  transcription_failed
+  feedback_timeout
+}
+
+// ──────────────────────────────────────────────
+// Models
+// ──────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  createdAt     DateTime  @default(now()) @map("created_at")
+  lastSessionAt DateTime? @map("last_session_at")
+
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Question {
+  id        String           @id @default(uuid())
+  text      String
+  category  QuestionCategory
+  level     QuestionLevel
+  roleTag   String           @map("role_tag")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  sessions Session[]
+
+  @@index([category, level])
+  @@map("questions")
+}
+
+model Session {
+  id         String        @id @default(uuid())
+  userId     String        @map("user_id")
+  questionId String        @map("question_id")
+  status     SessionStatus @default(pending)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+  answers  Answer[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("sessions")
+}
+
+model Answer {
+  id         String       @id @default(uuid())
+  sessionId  String       @map("session_id")
+  textAnswer String?      @map("text_answer")
+  audioUrl   String?      @map("audio_url")
+  audioPath  String?      @map("audio_path")
+  transcript String?
+  duration   Int?         // seconds
+  status     AnswerStatus @default(pending)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  session  Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  feedback Feedback?
+
+  @@index([sessionId])
+  @@map("answers")
+}
+
+model Feedback {
+  id             String   @id @default(uuid())
+  answerId       String   @unique @map("answer_id")
+  clarityScore   Int      @map("clarity_score")    // 1-5
+  structureScore Int      @map("structure_score")  // 1-5
+  contentScore   Int      @map("content_score")    // 1-5
+  starCompliance Int      @map("star_compliance")  // 1-5
+  evidence       String   // quoted excerpt from transcript
+  strengths      String[] // array of strengths
+  improvements   String[] // array of improvement suggestions
+  summary        String   // max 280 chars
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  answer Answer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@map("feedback")
+}
