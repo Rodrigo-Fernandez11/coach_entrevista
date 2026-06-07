@@ -23,7 +23,6 @@ Una aplicación web para practicar entrevistas de trabajo con retroalimentación
 | **Backend** | Next.js API Routes |
 | **Database** | PostgreSQL (Supabase) |
 | **ORM** | Prisma 6.9 |
-| **Auth** | Supabase Auth (OAuth) |
 | **AI/LLM** | OpenAI (GPT + Whisper) |
 | **State Management** | Zustand 5 |
 | **Validation** | Zod 3.24 |
@@ -97,11 +96,7 @@ coach_entrevistas/
 │   │   └── answers/         # Answers & feedback (❌ pendiente)
 │   │       └── [id]/
 │   │           └── feedback/route.ts
-│   ├── auth/                # Auth flow
-│   │   └── callback/route.ts # OAuth callback
 │   ├── page.tsx             # Home (start session)
-│   ├── login/               # Login page
-│   ├── signup/              # Signup page
 │   ├── interview/           # Interview flow (❌ pendiente)
 │   │   └── [sessionId]/page.tsx
 │   ├── feedback/            # Feedback results (❌ pendiente)
@@ -203,8 +198,7 @@ createdAt: DateTime
 
 ```
 1. Usuario llega a home (/page.tsx)
-   → Si no está autenticado → redirect a /login
-   → Si está autenticado → muestra StartSessionForm
+   -> Muestra StartSessionForm sin requerir login
 
 2. StartSessionForm
    → Selecciona categoría (behavioral, technical, situational)
@@ -249,7 +243,7 @@ createdAt: DateTime
 - [x] PATCH /api/questions/:id — actualizar
 - [x] DELETE /api/questions/:id — eliminar
 - [x] Validación con Zod
-- [x] Auth requerida
+- [x] Mutaciones protegidas mientras no hay login
 
 **Branch:** `feat/questions-api`  
 **Commit:** eee8dc0
@@ -476,7 +470,7 @@ pnpm dev
 
 - [Next.js 15 Docs](https://nextjs.org/docs)
 - [Prisma Docs](https://www.prisma.io/docs)
-- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [Supabase Docs](https://supabase.com/docs)
 - [OpenAI API](https://platform.openai.com/docs)
 - [Tailwind CSS 4](https://tailwindcss.com/docs)
 - [Zod Validation](https://zod.dev)

@@ -1,44 +1,27 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getUserSessions } from "@/lib/db/queries";
 import { prisma } from "@/lib/db/client";
 
+const ANONYMOUS_USER_ID = "00000000-0000-0000-0000-000000000000";
+const ANONYMOUS_USER_EMAIL = "anonymous@local.test";
+
 /**
  * GET /api/sessions
- * Returns the 20 most recent sessions for the authenticated user.
- * Returns 401 if not authenticated.
+ * Returns the 20 most recent anonymous sessions.
  */
 export async function GET() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const sessions = await getUserSessions(user.id);
+  const sessions = await getUserSessions(ANONYMOUS_USER_ID);
 
   return NextResponse.json({ sessions });
 }
 
 /**
  * POST /api/sessions
- * Creates a new session for the authenticated user.
+ * Creates a new anonymous practice session.
  * Body: { questionId: string }
  * Returns: { sessionId: string }
  */
 export async function POST(request: NextRequest) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { questionId } = body;
 
@@ -49,16 +32,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Ensure user exists in our DB (Supabase auth user may not have a DB record yet)
+  // Keep the current schema intact while the MVP runs without user accounts.
   await prisma.user.upsert({
-    where: { id: user.id },
+    where: { id: ANONYMOUS_USER_ID },
     update: { lastSessionAt: new Date() },
-    create: { id: user.id, email: user.email! },
+    create: { id: ANONYMOUS_USER_ID, email: ANONYMOUS_USER_EMAIL },
   });
 
   const session = await prisma.session.create({
     data: {
-      userId: user.id,
+      userId: ANONYMOUS_USER_ID,
       questionId,
     },
   });

@@ -1,17 +1,6 @@
-import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import StartSessionForm from "@/components/StartSessionForm";
 
-export default async function HomePage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
+export default function HomePage() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto max-w-2xl px-4 py-16">
