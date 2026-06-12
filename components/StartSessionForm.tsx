@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/lib/translations";
+import CategorySelector from "@/components/CategorySelector";
+import LevelSelector from "@/components/LevelSelector";
 
 type Category = "behavioral" | "technical" | "situational" | "";
 type Level = "junior" | "mid" | "senior" | "";
@@ -59,65 +61,28 @@ export default function StartSessionForm() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
         {t("startNewSession")}
       </h2>
 
-      <form onSubmit={handleStartSession} className="space-y-6">
+      <form onSubmit={handleStartSession} className="space-y-8">
         {error && (
           <div
             role="alert"
-            className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+            className="p-4 text-sm text-red-700 bg-red-50 border-l-4 border-red-600 rounded-lg dark:bg-red-900/20 dark:text-red-400 dark:border-red-500 animate-pulse"
           >
             {error}
           </div>
         )}
 
-        <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("questionType")}
-          </label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as Category)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">{t("anyType")}</option>
-            <option value="behavioral">{t("behavioral")}</option>
-            <option value="technical">{t("technical")}</option>
-            <option value="situational">{t("situational")}</option>
-          </select>
-        </div>
-
-        <div>
-          <label
-            htmlFor="level"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {t("experienceLevel")}
-          </label>
-          <select
-            id="level"
-            value={level}
-            onChange={(e) => setLevel(e.target.value as Level)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">{t("anyLevel")}</option>
-            <option value="junior">{t("junior")}</option>
-            <option value="mid">{t("mid")}</option>
-            <option value="senior">{t("senior")}</option>
-          </select>
-        </div>
+        <CategorySelector value={category} onChange={setCategory} />
+        <LevelSelector value={level} onChange={setLevel} />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3.5 text-base font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
         >
           {loading ? t("startingButton") : t("startButton")}
         </button>

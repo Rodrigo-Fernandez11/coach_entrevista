@@ -6,26 +6,26 @@ export default function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
 
   return (
-    <div className="flex gap-2">
+    <div className="inline-flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       <button
         onClick={() => setLanguage("es")}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+        className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 ${
           language === "es"
-            ? "bg-indigo-600 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            ? "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
         }`}
       >
-        Español
+        ES
       </button>
       <button
         onClick={() => setLanguage("en")}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+        className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 ${
           language === "en"
-            ? "bg-indigo-600 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            ? "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
         }`}
       >
-        English
+        EN
       </button>
     </div>
   );
