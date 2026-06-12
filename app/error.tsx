@@ -1,13 +1,13 @@
 "use client";
-
+// usamos use cluent por que este componente se renderiza en el cliente, no en el servidor, y necesitamos usar hooks como useEffect para manejar los errores de manera adecuada.
 import { useEffect } from "react";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: Error & { digest?: string }; // el error puede tener una propiedad digest opcional que proporciona información adicional sobre el error.
+  reset: () => void; // reset es una función que se llama para restablecer el estado de error y permitir que el usuario intente nuevamente.
 }) {
   useEffect(() => {
     console.error(error);
