@@ -1,5 +1,6 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { getTranslation } from "@/lib/translations";
+"use client";
+
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 type Category = "behavioral" | "technical" | "situational" | "";
 
@@ -8,19 +9,18 @@ interface CategorySelectorProps {
   onChange: (value: Category) => void;
 }
 
-const categories: { value: Category; label: string }[] = [
-  { value: "", label: "questionType" },
-  { value: "behavioral", label: "behavioral" },
-  { value: "technical", label: "technical" },
-  { value: "situational", label: "situational" },
+const categories: Array<{ value: Category; translationKey: "anyType" | "behavioral" | "technical" | "situational" }> = [
+  { value: "", translationKey: "anyType" },
+  { value: "behavioral", translationKey: "behavioral" },
+  { value: "technical", translationKey: "technical" },
+  { value: "situational", translationKey: "situational" },
 ];
 
 export default function CategorySelector({
   value,
   onChange,
 }: CategorySelectorProps) {
-  const { language } = useLanguage();
-  const t = (key: any) => getTranslation(language, key);
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -31,6 +31,7 @@ export default function CategorySelector({
         {categories.map((cat) => (
           <button
             key={cat.value || "any"}
+            type="button"
             onClick={() => onChange(cat.value)}
             className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
               value === cat.value
@@ -38,7 +39,7 @@ export default function CategorySelector({
                 : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
-            {t(cat.label === "questionType" ? "anyType" : (cat.label as any))}
+            {t(cat.translationKey)}
           </button>
         ))}
       </div>

@@ -1,5 +1,6 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { getTranslation } from "@/lib/translations";
+"use client";
+
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 type Level = "junior" | "mid" | "senior" | "";
 
@@ -8,19 +9,15 @@ interface LevelSelectorProps {
   onChange: (value: Level) => void;
 }
 
-const levels: { value: Level; label: string }[] = [
-  { value: "", label: "anyLevel" },
-  { value: "junior", label: "junior" },
-  { value: "mid", label: "mid" },
-  { value: "senior", label: "senior" },
+const levels: Array<{ value: Level; translationKey: "anyLevel" | "junior" | "mid" | "senior" }> = [
+  { value: "", translationKey: "anyLevel" },
+  { value: "junior", translationKey: "junior" },
+  { value: "mid", translationKey: "mid" },
+  { value: "senior", translationKey: "senior" },
 ];
 
-export default function LevelSelector({
-  value,
-  onChange,
-}: LevelSelectorProps) {
-  const { language } = useLanguage();
-  const t = (key: any) => getTranslation(language, key);
+export default function LevelSelector({ value, onChange }: LevelSelectorProps) {
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -31,6 +28,7 @@ export default function LevelSelector({
         {levels.map((lvl) => (
           <button
             key={lvl.value || "any"}
+            type="button"
             onClick={() => onChange(lvl.value)}
             className={`px-3 py-2 rounded-lg font-medium text-sm transition-all ${
               value === lvl.value
@@ -38,7 +36,7 @@ export default function LevelSelector({
                 : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
-            {t(lvl.label as any)}
+            {t(lvl.translationKey)}
           </button>
         ))}
       </div>

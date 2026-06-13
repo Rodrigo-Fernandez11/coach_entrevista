@@ -32,9 +32,6 @@ importers:
       zod:
         specifier: ^3.24.4
         version: 3.25.76
-      zustand:
-        specifier: ^5.0.4
-        version: 5.0.13(@types/react@19.2.15)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6))
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -2310,24 +2307,6 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zustand@5.0.13:
-    resolution: {integrity: sha512-efI2tVaVQPqtOh114loML/Z80Y4NP3yc+Ff0fYiZJPauNeWZeIp/bRFD7I9bfmCOYBh/PHxlglQ9+wvlwnPikQ==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      immer: '>=9.0.6'
-      react: '>=18.0.0'
-      use-sync-external-store: '>=1.2.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
-      use-sync-external-store:
-        optional: true
-
 snapshots:
 
   '@ai-sdk/openai@1.3.24(zod@3.25.76)':
@@ -2844,7 +2823,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-
   '@types/diff-match-patch@1.0.36': {}
 
   '@types/estree@1.0.9': {}
@@ -3225,7 +3203,6 @@ snapshots:
   confbox@0.2.4: {}
 
   consola@3.4.2: {}
-
 
   cross-spawn@7.0.6:
     dependencies:
@@ -4673,9 +4650,3 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
-
-  zustand@5.0.13(@types/react@19.2.15)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6)):
-    optionalDependencies:
-      '@types/react': 19.2.15
-      react: 19.2.6
-      use-sync-external-store: 1.6.0(react@19.2.6)
