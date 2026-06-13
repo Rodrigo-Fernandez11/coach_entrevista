@@ -42,9 +42,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# sensitive keys & credentials
-OPENAI_API_KEY
-SUPABASE_SERVICE_ROLE_KEY
+# prisma tmp binaries (OneDrive lock artifacts)
+*.dll.node.tmp*
 
 # vercel
 .vercel
