@@ -1,20 +1,36 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/client";
+import { questionIdSchema } from "@/lib/security/validation";
+import { checkRateLimit, GET_RATE_LIMIT } from "@/lib/security/rate-limit";
+import { extractIp, hashIp } from "@/lib/security/trial";
 
-/**
- * GET /api/questions/:id
- * Fetch a single question by ID.
- * Returns 404 if not found.
- */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limit by IP
+  const ip = extractIp(request.headers);
+  const rl = checkRateLimit(hashIp(ip), GET_RATE_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+    );
+  }
+
+  // Validate UUID param
   const { id } = await params;
+  const parsed = questionIdSchema.safeParse({ id });
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid question ID" },
+      { status: 400 }
+    );
+  }
 
   try {
     const question = await prisma.question.findUnique({
-      where: { id },
+      where: { id: parsed.data.id },
     });
 
     if (!question) {
@@ -33,10 +49,6 @@ export async function GET(
   }
 }
 
-/**
- * PATCH /api/questions/:id
- * Question mutations are disabled while the app runs without authentication.
- */
 export function PATCH() {
   return NextResponse.json(
     { error: "Question mutations are disabled" },
@@ -44,10 +56,6 @@ export function PATCH() {
   );
 }
 
-/**
- * DELETE /api/questions/:id
- * Question mutations are disabled while the app runs without authentication.
- */
 export function DELETE() {
   return NextResponse.json(
     { error: "Question mutations are disabled" },
