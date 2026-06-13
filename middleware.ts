@@ -1,76 +1,55 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
-const PUBLIC_ROUTES = ["/login", "/signup", "/auth/callback"];
-const PUBLIC_API_PREFIXES = ["/api/auth/"];
+export function middleware(request: NextRequest): NextResponse {
+  const response = NextResponse.next();
 
-function isPublicRoute(pathname: string): boolean {
-  if (PUBLIC_ROUTES.includes(pathname)) return true;
-  if (PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix)))
-    return true;
-  return false;
-}
-
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Allow public routes through without auth check
-  if (isPublicRoute(pathname)) {
-    return NextResponse.next();
-  }
-
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(
-          cookiesToSet: Array<{
-            name: string;
-            value: string;
-            options: CookieOptions;
-          }>
-        ) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
+  // ── Security headers ─────────────────────────────────────────────────────
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set(
+    "Referrer-Policy",
+    "strict-origin-when-cross-origin"
+  );
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
   );
 
-  // Refresh session if expired — required for SSR
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // ── CSRF-lite: block cross-origin non-GET API requests ───────────────────
+  // For non-GET API requests that include an Origin header, verify that the
+  // origin host matches the request host. This mitigates simple CSRF without
+  // requiring a token for this cookie-based trial system.
+  const method = request.method;
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
 
-  if (!user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    redirectUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(redirectUrl);
+  if (isApiRoute && method !== "GET" && method !== "HEAD") {
+    const origin = request.headers.get("origin");
+    if (origin) {
+      try {
+        const originHost = new URL(origin).host;
+        const requestHost = request.headers.get("host") ?? "";
+        if (originHost !== requestHost) {
+          return NextResponse.json(
+            { error: "Cross-origin request blocked" },
+            { status: 403 }
+          );
+        }
+      } catch {
+        // Malformed Origin header — block the request
+        return NextResponse.json(
+          { error: "Invalid origin" },
+          { status: 403 }
+        );
+      }
+    }
   }
 
-  return supabaseResponse;
+  return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths EXCEPT:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/api/:path*",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

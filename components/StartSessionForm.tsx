@@ -1,121 +1,75 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useStartSession } from "@/hooks/useStartSession";
+import CategorySelector from "@/components/CategorySelector";
+import LevelSelector from "@/components/LevelSelector";
 
 type Category = "behavioral" | "technical" | "situational" | "";
 type Level = "junior" | "mid" | "senior" | "";
 
 export default function StartSessionForm() {
-  const router = useRouter();
+  const { t } = useTranslation();
+  const { loading, error, startSession } = useStartSession();
   const [category, setCategory] = useState<Category>("");
   const [level, setLevel] = useState<Level>("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleStartSession(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      const params = new URLSearchParams();
-      if (category) params.set("category", category);
-      if (level) params.set("level", level);
-
-      // Fetch a question matching the selected filters
-      const qRes = await fetch(`/api/questions?${params.toString()}`);
-      if (!qRes.ok) {
-        const body = await qRes.json();
-        setError(body.error ?? "No questions match your filters");
-        setLoading(false);
-        return;
-      }
-      const { question } = await qRes.json();
-
-      // Create a session via server action
-      const sRes = await fetch("/api/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionId: question.id }),
-      });
-
-      if (!sRes.ok) {
-        setError("Failed to start session. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      const { sessionId } = await sRes.json();
-      router.push(`/session/${sessionId}`);
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setLoading(false);
-    }
+    await startSession(category, level);
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-        Start a new session
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+        {t("startNewSession")}
       </h2>
 
-      <form onSubmit={handleStartSession} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {error && (
           <div
             role="alert"
-            className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+            className="p-4 text-sm text-red-700 bg-red-50 border-l-4 border-red-600 rounded-lg dark:bg-red-900/20 dark:text-red-400 dark:border-red-500"
           >
             {error}
           </div>
         )}
 
-        <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            Question type
-          </label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as Category)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">Any type</option>
-            <option value="behavioral">Behavioral</option>
-            <option value="technical">Technical</option>
-            <option value="situational">Situational</option>
-          </select>
-        </div>
-
-        <div>
-          <label
-            htmlFor="level"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            Experience level
-          </label>
-          <select
-            id="level"
-            value={level}
-            onChange={(e) => setLevel(e.target.value as Level)}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">Any level</option>
-            <option value="junior">Junior</option>
-            <option value="mid">Mid</option>
-            <option value="senior">Senior</option>
-          </select>
-        </div>
+        <CategorySelector value={category} onChange={setCategory} />
+        <LevelSelector value={level} onChange={setLevel} />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3.5 text-base font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
         >
-          {loading ? "Starting session…" : "Start session →"}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg
+                className="animate-spin h-4 w-4 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              {t("startingButton")}
+            </span>
+          ) : (
+            t("startButton")
+          )}
         </button>
       </form>
     </div>

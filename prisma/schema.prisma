@@ -77,6 +77,7 @@ model Session {
   userId     String        @map("user_id")
   questionId String        @map("question_id")
   status     SessionStatus @default(pending)
+  trialId    String?       @map("trial_id")
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
 
@@ -85,7 +86,20 @@ model Session {
   answers  Answer[]
 
   @@index([userId, createdAt(sort: Desc)])
+  @@index([trialId])
   @@map("sessions")
+}
+
+model TrialUsage {
+  id            String   @id @default(uuid())
+  trialId       String   @unique @map("trial_id")
+  ipHash        String   @map("ip_hash")
+  feedbackCount Int      @default(0) @map("feedback_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([ipHash])
+  @@map("trial_usage")
 }
 
 model Answer {
@@ -103,7 +117,7 @@ model Answer {
   session  Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   feedback Feedback?
 
-  @@index([sessionId])
+  @@unique([sessionId])
   @@map("answers")
 }
 
