@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import type { TranslationKey } from "@/lib/translations";
 
 interface FeedbackData {
@@ -56,6 +57,7 @@ function ScoreBar({ label, score }: ScoreBarProps) {
 
 export default function FeedbackResult({ feedback }: FeedbackResultProps) {
   const { t } = useTranslation();
+  const hydrated = useHydrated();
 
   const scores: Array<{ key: TranslationKey; value: number }> = [
     { key: "clarityScore", value: feedback.clarityScore },
@@ -63,6 +65,10 @@ export default function FeedbackResult({ feedback }: FeedbackResultProps) {
     { key: "contentScore", value: feedback.contentScore },
     { key: "starCompliance", value: feedback.starCompliance },
   ];
+
+  if (!hydrated) {
+    return <div className="space-y-6" />;
+  }
 
   return (
     <div className="space-y-6">

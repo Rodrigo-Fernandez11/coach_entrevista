@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import FeedbackResult from "@/components/FeedbackResult";
 
 interface FeedbackData {
@@ -25,6 +26,7 @@ interface AnswerFormProps {
 
 export default function AnswerForm({ sessionId }: AnswerFormProps) {
   const { t, language } = useTranslation();
+  const hydrated = useHydrated();
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackData | null>(null);
@@ -35,6 +37,10 @@ export default function AnswerForm({ sessionId }: AnswerFormProps) {
 
   const charCount = answer.length;
   const isValid = charCount >= MIN_CHARS && charCount <= MAX_CHARS;
+
+  if (!hydrated) {
+    return <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8" />;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
