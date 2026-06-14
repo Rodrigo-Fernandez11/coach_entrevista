@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 
 type Level = "junior" | "mid" | "senior" | "";
 
@@ -18,6 +19,11 @@ const levels: Array<{ value: Level; translationKey: "anyLevel" | "junior" | "mid
 
 export default function LevelSelector({ value, onChange }: LevelSelectorProps) {
   const { t } = useTranslation();
+  const hydrated = useHydrated();
+
+  if (!hydrated) {
+    return <div />;
+  }
 
   return (
     <div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import { useStartSession } from "@/hooks/useStartSession";
 import CategorySelector from "@/components/CategorySelector";
 import LevelSelector from "@/components/LevelSelector";
@@ -11,6 +12,7 @@ type Level = "junior" | "mid" | "senior" | "";
 
 export default function StartSessionForm() {
   const { t } = useTranslation();
+  const hydrated = useHydrated();
   const { loading, error, startSession } = useStartSession();
   const [category, setCategory] = useState<Category>("");
   const [level, setLevel] = useState<Level>("");
@@ -18,6 +20,10 @@ export default function StartSessionForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     await startSession(category, level);
+  }
+
+  if (!hydrated) {
+    return <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8" />;
   }
 
   return (

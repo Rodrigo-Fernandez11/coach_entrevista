@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import StartSessionForm from "@/components/StartSessionForm";
 import Header from "@/components/Header";
 
@@ -12,6 +13,16 @@ const HOW_IT_WORKS_STEPS = [
 
 export default function HomePageContent() {
   const { t } = useTranslation();
+  const hydrated = useHydrated();
+
+  if (!hydrated) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" />
+      </>
+    );
+  }
 
   return (
     <>

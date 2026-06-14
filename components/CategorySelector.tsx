@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 
 type Category = "behavioral" | "technical" | "situational" | "";
 
@@ -21,6 +22,11 @@ export default function CategorySelector({
   onChange,
 }: CategorySelectorProps) {
   const { t } = useTranslation();
+  const hydrated = useHydrated();
+
+  if (!hydrated) {
+    return <div />;
+  }
 
   return (
     <div>
