@@ -10,16 +10,16 @@ export const ANONYMOUS_USER_EMAIL = "anonymous@local.test";
 // ── Trial gating ────────────────────────────────────────────────────────────
 /** Max AI feedback calls allowed per trial cookie */
 export const TRIAL_MAX_FEEDBACK = Number(
-  process.env.TRIAL_MAX_FEEDBACK ?? "1"
+  process.env["TRIAL_MAX_FEEDBACK"] ?? "1"
 );
 
 /** Hard cap on total feedback calls served across all users in a calendar day */
 export const DAILY_FEEDBACK_CAP = Number(
-  process.env.DAILY_FEEDBACK_CAP ?? "50"
+  process.env["DAILY_FEEDBACK_CAP"] ?? "50"
 );
 
 /** Salt mixed into the IP before hashing. Set a random value in prod. */
-export const IP_HASH_SALT = process.env.IP_HASH_SALT ?? "";
+export const IP_HASH_SALT = process.env["IP_HASH_SALT"] ?? "";
 
 // ── AI / OpenAI ─────────────────────────────────────────────────────────────
 export const OPENAI_MODEL = "gpt-4o-mini";

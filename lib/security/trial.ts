@@ -52,7 +52,8 @@ export function extractIp(
 ): string {
   const forwarded = (headers as Headers).get("x-forwarded-for");
   if (forwarded) {
-    const first = forwarded.split(",")[0].trim();
+    const parts = forwarded.split(",");
+    const first = parts[0]?.trim();
     if (first) return first;
   }
   const realIp = (headers as Headers).get("x-real-ip");

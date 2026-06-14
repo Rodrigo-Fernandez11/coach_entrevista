@@ -172,7 +172,11 @@ export async function POST(request: NextRequest) {
   const answer = rawAnswer.slice(0, MAX_ANSWER_CHARS);
 
   // 9. Call OpenAI via AI SDK v4 generateObject
-  const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const apiKey = process.env["OPENAI_API_KEY"];
+  if (!apiKey) {
+    throw new Error("Missing OPENAI_API_KEY environment variable");
+  }
+  const openai = createOpenAI({ apiKey });
 
   const langInstruction =
     language === "en"

@@ -8,14 +8,14 @@ export const metadata: Metadata = {
   title: "History — Interview Coach",
 };
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS = {
   pending: "Pending",
   completed: "Completed",
   transcription_failed: "Error",
   feedback_timeout: "Feedback error",
-};
+} as const;
 
-const STATUS_COLORS: Record<string, string> = {
+const STATUS_COLORS = {
   pending:
     "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
   completed:
@@ -24,13 +24,13 @@ const STATUS_COLORS: Record<string, string> = {
     "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
   feedback_timeout:
     "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-};
+} as const;
 
-const CATEGORY_LABELS: Record<string, string> = {
+const CATEGORY_LABELS = {
   behavioral: "Behavioral",
   technical: "Technical",
   situational: "Situational",
-};
+} as const;
 
 export default async function HistoryPage() {
   const jar = await cookies();

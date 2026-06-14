@@ -20,10 +20,11 @@ function prune(entry: WindowEntry, windowMs: number, now: number): void {
   const cutoff = now - windowMs;
   // Remove expired timestamps in-place
   let i = 0;
-  while (i < entry.timestamps.length && entry.timestamps[i] < cutoff) {
+  const { timestamps } = entry;
+  while (i < timestamps.length && timestamps[i]! < cutoff) {
     i++;
   }
-  if (i > 0) entry.timestamps.splice(0, i);
+  if (i > 0) timestamps.splice(0, i);
 }
 
 export interface RateLimitConfig {
@@ -62,14 +63,15 @@ export function checkRateLimit(
 
   prune(entry, windowMs, now);
 
-  const count = entry.timestamps.length;
+  const { timestamps } = entry;
+  const count = timestamps.length;
 
   if (count >= limit) {
-    const resetAt = entry.timestamps[0] + windowMs;
+    const resetAt = timestamps[0]! + windowMs;
     return { allowed: false, remaining: 0, resetAt };
   }
 
-  entry.timestamps.push(now);
+  timestamps.push(now);
   return { allowed: true, remaining: limit - count - 1, resetAt: now + windowMs };
 }
 
