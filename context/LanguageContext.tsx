@@ -8,29 +8,40 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType>({
-  language: "en",
-  setLanguage: () => {},
-});
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+function getInitialLanguage(): Language {
+  if (typeof window === "undefined") return "en";
+
+  const saved = localStorage.getItem("language") as Language | null;
+  if (saved && (saved === "es" || saved === "en")) {
+    return saved;
+  }
+  return "en";
+}
 
 export function LanguageProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>(() => getInitialLanguage());
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("language") as Language | null;
-    if (saved && (saved === "es" || saved === "en")) {
-      setLanguageState(saved);
-    }
+    setMounted(true);
   }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem("language", lang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("language", lang);
+    }
   };
+
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>
@@ -39,10 +50,10 @@ export function LanguageProvider({
   );
 }
 
-export function useLanguage() {
+export function useLanguage(): LanguageContextType {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error("useLanguage must be used within LanguageProvider");
+    return { language: "en", setLanguage: () => {} };
   }
   return context;
 }
