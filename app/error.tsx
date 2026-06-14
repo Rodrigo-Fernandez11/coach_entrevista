@@ -3,27 +3,21 @@
 import { useEffect } from "react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
-export default function Error({
-  error,
-  reset,
-}: {
+interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log to error reporting service in production; never expose to UI
     console.error(error);
   }, [error]);
 
-  return (
-    <ErrorContent reset={reset} />
-  );
+  return <ErrorContent reset={reset} />;
 }
 
-// Separate component so we can use the hook (which needs LanguageProvider context)
 function ErrorContent({ reset }: { reset: () => void }) {
   const { t } = useTranslation();
-
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="text-center">
